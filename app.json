@@ -1,0 +1,12 @@
+{
+  "name": "Hello board app",
+  "description": "Hello board app sample.",
+  "keywords": [
+    "chart.js",
+    "express",
+    "express-ws",
+    "node-serialport",
+    "serialport"
+  ],
+  "repository": "https://github.com/madjid-asa/hello-board-app"
+}
