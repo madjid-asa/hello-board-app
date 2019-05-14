@@ -1,12 +1,11 @@
 const express     = require('express');
 const app         = express();
 const expressWs   = require('express-ws')(app);
-const morgan      = require('morgan');
-const compression = require('compression');
-const serveStatic = require('serve-static');
 const basicAuth   = require('basic-auth-connect');
-var SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
+
+require('./server/config/environment.js')(app, express);
+const mySerialPort = require('./server/serialPort.js');
 
 const LED_ACTION = "led_action";
 const LED_VALUE_ACTION = "led_value";
@@ -20,43 +19,13 @@ const pass = process.env.PASS;
 let connects = [];
 let deviceIsConnected = false;
 
-
-var serialPort = new SerialPort('COM11', {
-  autoOpen: false,
-  baudRate: 9600
-});
+var serialPort = mySerialPort.serialPort;
 
 const parserialPortser = serialPort.pipe(new Readline({ delimiter: '\r\n' }));
 
-serialPort.on('error', err => {
-  console.error(err); // THIS SHOULD WORK!
-});
-
-const openSerialPort = () => {
-  serialPort.open(err => {
-    if (err) {
-      console.error(err);
-      deviceIsConnected = false;
-    } else {
-      deviceIsConnected = true;
-    }
-    console.log(deviceIsConnected);
-    sendDataToWs(CONNECT_VALUE_ACTION, deviceIsConnected, connects);
-  })
-};
-
-const closeSerialPort = () => {
-  serialPort.close( err => {
-    if (err) {
-      console.error(err);
-    } else {
-      deviceIsConnected = false;
-    }
-    sendDataToWs(CONNECT_VALUE_ACTION, deviceIsConnected, connects);
-  });
-};
-
 function sendDataToWs(type, value, connects) {
+  console.log(type, value, connects);
+  
   var msg = JSON.stringify({ type, value });
   connects.forEach(socket => {
     socket.send(msg);
@@ -81,9 +50,10 @@ if (user && pass) {
   app.use(basicAuth(user, pass));
 }
 
-app.use(morgan('dev'));
-app.use(compression());
-app.use(serveStatic(`${__dirname}/public`));
+const callbackEvntSerialPort = (deviceIsConnected) => {
+  console.log(CONNECT_VALUE_ACTION, deviceIsConnected, connects);
+  sendDataToWs(CONNECT_VALUE_ACTION, deviceIsConnected, connects);
+};
 
 app.ws('/', (ws, req) => {
   connects.push(ws);
@@ -93,13 +63,13 @@ app.ws('/', (ws, req) => {
     var jsonMsg = JSON.parse(message);
     switch(jsonMsg.type) {
       case LED_ACTION:
-        serialPort.write(""+jsonMsg.value);
+        mySerialPort.writeMsg(""+jsonMsg.value);
         break;
       case CONNECT_ACTION:
-        openSerialPort();
+        mySerialPort.openSerialPort(callbackEvntSerialPort);
         break;
       case CLOSE_ACTION:
-        closeSerialPort();
+        mySerialPort.closeSerialPort(callbackEvntSerialPort);
         break;
       default:
         console.warn("Don't know this kind of actions : ", jsonMsg.type)
@@ -119,4 +89,4 @@ app.listen(app.get('port'), () => {
 });
 
 // init
-openSerialPort();
+mySerialPort.openSerialPort(callbackEvntSerialPort);
