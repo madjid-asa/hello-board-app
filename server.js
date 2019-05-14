@@ -6,6 +6,7 @@ const Readline = require('@serialport/parser-readline');
 
 require('./server/config/environment.js')(app, express);
 const mySerialPort = require('./server/serialPort.js');
+var websockets = require('./server/websockets.js');
 
 const LED_ACTION = "led_action";
 const LED_VALUE_ACTION = "led_value";
@@ -23,20 +24,10 @@ var serialPort = mySerialPort.serialPort;
 
 const parserialPortser = serialPort.pipe(new Readline({ delimiter: '\r\n' }));
 
-function sendDataToWs(type, value, connects) {
-  console.log(type, value, connects);
-  
-  var msg = JSON.stringify({ type, value });
-  connects.forEach(socket => {
-    socket.send(msg);
-  });  
-};
-
-// Switches the port into "flowing mode"
 parserialPortser.on('data', function (data) {
   // console.log('Data:', data);
   // Need to be tested
-  sendDataToWs(LED_VALUE_ACTION, data, connects);
+  websockets.sendDataToWs(LED_VALUE_ACTION, data);
 });
 
 // Read data that is available but keep the stream from entering //"flowing mode"
@@ -51,12 +42,11 @@ if (user && pass) {
 }
 
 const callbackEvntSerialPort = (deviceIsConnected) => {
-  console.log(CONNECT_VALUE_ACTION, deviceIsConnected, connects);
-  sendDataToWs(CONNECT_VALUE_ACTION, deviceIsConnected, connects);
+  websockets.sendDataToWs(CONNECT_VALUE_ACTION, deviceIsConnected);
 };
 
 app.ws('/', (ws, req) => {
-  connects.push(ws);
+  websockets.addUsers(ws);
 
   ws.on('message', message => {
     console.log('Received -', message, '-', deviceIsConnected);

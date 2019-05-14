@@ -115,6 +115,8 @@
   // websockets
   ws.onmessage = function(msg) {
     var jsonMsg = JSON.parse(msg.data);
+    console.log(msg.data);
+    
     switch(jsonMsg.type) {
       case LED_VALUE_ACTION:
         addValueToChart(jsonMsg.value);
