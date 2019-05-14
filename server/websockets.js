@@ -11,4 +11,10 @@ const sendDataToWs = (type, value) => {
   });
 };
 
-module.exports = {addUsers, sendDataToWs};
+const wsCallBackClose = () => {
+  connects = connects.filter(conn => {
+    return (conn === ws) ? false : true;
+  });
+}
+
+module.exports = {addUsers, sendDataToWs, wsCallBackClose};

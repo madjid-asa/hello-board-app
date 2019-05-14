@@ -1,12 +1,22 @@
 const SerialPort = require('serialport');
+const Readline = require('@serialport/parser-readline');
 
-const serialPort = new SerialPort('COM11', {
-  autoOpen: false,
-  baudRate: 9600
-});
+var serialPort;
+
+const initSerialPort = (port, callbackReading) => {
+    serialPort= new SerialPort(port, {
+    autoOpen: false,
+    baudRate: 9600
+  });
+
+  // parser
+  const parserialPortser = serialPort.pipe(new Readline({ delimiter: '\r\n' }));
+  parserialPortser.on('data', callbackReading);
+
+  return serialPort;
+}
 
 let deviceIsConnected = false;
-
 
 const openSerialPort = callback => {
   serialPort.open(err => {
@@ -36,9 +46,4 @@ const writeMsg = msg => {
 }
 
 
-// Events
-serialPort.on('error', err => {
-  console.error(err); // THIS SHOULD WORK!
-});
-
-module.exports = {serialPort, openSerialPort, closeSerialPort, writeMsg}
+module.exports = {initSerialPort, openSerialPort, closeSerialPort, writeMsg}

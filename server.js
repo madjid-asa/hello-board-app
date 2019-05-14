@@ -2,7 +2,6 @@ const express     = require('express');
 const app         = express();
 const expressWs   = require('express-ws')(app);
 const basicAuth   = require('basic-auth-connect');
-const Readline = require('@serialport/parser-readline');
 
 require('./server/config/environment.js')(app, express);
 const mySerialPort = require('./server/serialPort.js');
@@ -17,23 +16,17 @@ const CLOSE_ACTION = "close_action";
 const user = process.env.USER;
 const pass = process.env.PASS;
 
-let connects = [];
-let deviceIsConnected = false;
 
-var serialPort = mySerialPort.serialPort;
+const callbackAction = (action, data) => {
+  websockets.sendDataToWs(action, data);
+};
 
-const parserialPortser = serialPort.pipe(new Readline({ delimiter: '\r\n' }));
-
-parserialPortser.on('data', function (data) {
-  // console.log('Data:', data);
-  // Need to be tested
+const callbackSPReading = data => {
   websockets.sendDataToWs(LED_VALUE_ACTION, data);
-});
+};
 
-// Read data that is available but keep the stream from entering //"flowing mode"
-parserialPortser.on('readable', function () {
-  // console.log('Data:', port.read());
-});
+var serialPort = mySerialPort.initSerialPort('COM11', callbackSPReading);
+
 
 app.set('port', process.env.PORT || 3000);
 
@@ -42,14 +35,13 @@ if (user && pass) {
 }
 
 const callbackEvntSerialPort = (deviceIsConnected) => {
-  websockets.sendDataToWs(CONNECT_VALUE_ACTION, deviceIsConnected);
+  callbackAction(CONNECT_VALUE_ACTION, deviceIsConnected);
 };
 
 app.ws('/', (ws, req) => {
   websockets.addUsers(ws);
 
   ws.on('message', message => {
-    console.log('Received -', message, '-', deviceIsConnected);
     var jsonMsg = JSON.parse(message);
     switch(jsonMsg.type) {
       case LED_ACTION:
@@ -67,11 +59,7 @@ app.ws('/', (ws, req) => {
     }
   });
   
-  ws.on('close', () => {
-    connects = connects.filter(conn => {
-      return (conn === ws) ? false : true;
-    });
-  });
+  ws.on('close', websockets.wsCallBackClose);
 });
 
 app.listen(app.get('port'), () => {
