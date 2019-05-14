@@ -12,7 +12,7 @@
 
   const CONNECT_LABEL = "Connexion";
   const CONNECT_VALUE = "connected";
-  const DISCONNECT_LABEL = "Disconnexion";
+  const DISCONNECT_LABEL = "Disconnect";
   const DISCONNECT_VALUE = "disconnected";
 
   //Globals

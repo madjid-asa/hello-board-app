@@ -11,7 +11,7 @@ const sendDataToWs = (type, value) => {
   });
 };
 
-const wsCallBackClose = () => {
+const wsCallBackClose = (ws)=> () => {
   connects = connects.filter(conn => {
     return (conn === ws) ? false : true;
   });

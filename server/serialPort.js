@@ -21,7 +21,7 @@ let deviceIsConnected = false;
 const openSerialPort = callback => {
   serialPort.open(err => {
     if (err) {
-      console.error(err);
+      console.log(err);
       deviceIsConnected = false;
     } else {
       deviceIsConnected = true;
@@ -33,7 +33,7 @@ const openSerialPort = callback => {
 const closeSerialPort = callback => {
   serialPort.close( err => {
     if (err) {
-      console.error(err);
+      console.log(err);
     } else {
       deviceIsConnected = false;
     }

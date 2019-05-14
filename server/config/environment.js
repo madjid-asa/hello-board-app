@@ -7,5 +7,6 @@ module.exports = function(app, express){
     app.use(morgan('dev'));
     app.use(compression());
     app.use(serveStatic(`public`));
+    const expressWs   = require('express-ws')(app);
 
 };
