@@ -90,7 +90,6 @@
       classToAdd =  "btn-success";
       valBtn = CONNECT_VALUE;
     }
-    console.log(btnLabel, classToAdd, classToRemove);
     $('#connect').text(btnLabel);
     $('#connect').removeClass(classToRemove).addClass(classToAdd);
     $('#connect').val(valBtn);

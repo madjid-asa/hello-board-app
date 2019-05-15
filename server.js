@@ -11,7 +11,6 @@ const serialPort = mySerialPort.initSerialPort('COM11', callbacks.callbackSPRead
 
 app.set('port', process.env.PORT || 3000);
 
-
 app.ws('/', (ws, req) => {
   websockets.addUsers(ws);
 
