@@ -2,6 +2,8 @@
 
 Hello board app using express-ws, and [node-serialports](https://github.com/serialport/node-serialport) .
 
+![app_demo](./app_demo.jpg)
+
 ## Development
 
 :warning: you need to have connexion with a board that send one data each `x` seconds.
