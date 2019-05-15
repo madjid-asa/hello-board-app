@@ -6,7 +6,7 @@ module.exports = function(app, express){
     app.set('port', process.env.PORT || 3000);
     app.use(morgan('dev'));
     app.use(compression());
-    app.use(serveStatic(`public`));
+    app.use(serveStatic(`../public`));
     const expressWs   = require('express-ws')(app);
 
 };

@@ -12,7 +12,10 @@
     "express-ws": "^2.0.0",
     "moment": "^2.24.0",
     "morgan": "^1.7.0",
+    "sequelize": "^5.8.6",
+    "sequelize-cli": "^5.4.0",
     "serialport": "^7.1.5",
-    "serve-static": "^1.11.1"
+    "serve-static": "^1.11.1",
+    "sqlite3": "^4.0.8"
   }
 }

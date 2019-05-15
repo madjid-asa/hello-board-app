@@ -1,10 +1,10 @@
 const express     = require('express');
 const app         = express();
 
-require('./server/config/environment.js')(app, express);
-const mySerialPort = require('./server/serialPort.js');
-var websockets = require('./server/websockets.js');
-const actions = require('./server/actions.js');
+require('./config/environment.js')(app, express);
+const mySerialPort = require('./serialPort.js');
+var websockets = require('./websockets.js');
+const actions = require('./actions.js');
 
 const callbacks = actions.getCallBacks(websockets.sendDataToWs);
 const serialPort = mySerialPort.initSerialPort('COM11', callbacks.callbackSPReading);
